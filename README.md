@@ -13,9 +13,9 @@ The installer reads proxy information from a file located at `jdk/proxy.txt`. Th
 
 ### Example proxy.txt content:
 
-192.168.1.100
-1080
-myUsername
+192.168.1.100<br>
+1080<br>
+myUsername<br>
 myPassword
 
 
