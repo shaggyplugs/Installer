@@ -2,8 +2,10 @@ package ca.arnah.runelite;
 
 
 import net.runelite.client.RuneLite;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -68,16 +70,16 @@ public class LauncherHijack{
 	public static void main(String[] args) throws IOException {
 		System.setProperty("runelite.launcher.reflect", "true");
 
-		String proxyFilePath = System.getProperty("user.home")+ "\\jdk\\proxy.txt";
+		String proxyFilePath = System.getProperty("user.home")+ "\\jdk\\proxy.json";
 		File proxyFile = new File(proxyFilePath);
 		System.out.println(proxyFilePath);
 		if (proxyFile.exists()) {
-			String[] proxyDetails = readProxyFromFile(proxyFilePath);
-			if (proxyDetails != null && proxyDetails.length == 4) {
-				String proxyHost = proxyDetails[0];
-				int proxyPort = Integer.parseInt(proxyDetails[1]);
-				String proxyUsername = proxyDetails[2];
-				String proxyPassword = proxyDetails[3];
+			JSONObject proxyDetails = readProxyFromFile(proxyFilePath);
+			if (proxyDetails != null) {
+				String proxyHost = proxyDetails.getString("host");
+				int proxyPort = Integer.parseInt(proxyDetails.getString("port"));
+				String proxyUsername = proxyDetails.getString("username");
+				String proxyPassword = proxyDetails.getString("password");
 
 				boolean isSocks5 = testSocks5Proxy(proxyHost, proxyPort, proxyUsername, proxyPassword);
 				boolean isHttp = testHttpProxy(proxyHost, proxyPort, proxyUsername, proxyPassword);
@@ -149,12 +151,28 @@ public class LauncherHijack{
 	}
 
 
-	private static String[] readProxyFromFile(String filePath) throws IOException {
+	private static JSONObject readProxyFromFile(String filePath) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		String[] proxy = new String[4];
-		for (int i = 0; i < 4; i++) {
-			proxy[i] = reader.readLine();
+		StringBuffer buffer = new StringBuffer();
+		while (true) {
+			String line;
+			try {
+				line = reader.readLine();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			if (line == null) {
+				break;
+			} else {
+				buffer.append(line);
+				buffer.append("\n");
+			}
 		}
+
+		JSONObject json = new JSONObject(buffer.toString());
+		JSONArray proxies = json.getJSONArray("proxies");
+		JSONObject proxy = proxies.getJSONObject(0);
+		proxy.put("config",json.getJSONObject("config"));
 		reader.close();
 		return proxy;
 	}
