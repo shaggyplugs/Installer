@@ -4,19 +4,29 @@ This is a modified fork of [Arnuh's RuneLiteHijack](https://github.com/Arnuh/Run
 
 ## Proxy Configuration
 
-The installer reads proxy information from a file located at `jdk/proxy.txt`. The format of this file should follow a specific order:
+The installer reads proxy information from a file located at `jdk/proxy.json`. The format of this file should follow a specific order:
 
 1. **IP:** The IP address of the proxy server.
 2. **Port:** The port number of the proxy server.
 3. **Username:** The username for proxy authentication.
 4. **Password:** The password for proxy authentication.
-
+5. **Clients Per Proxy:** The amount of clients that run on each proxy 
 ### Example proxy.txt content:
 
-192.168.1.100<br>
-1080<br>
-myUsername<br>
-myPassword
+```json
+"proxies":[
+  "proxy":{
+    "host": "127.0.0.1",
+    "port":"1234",
+    "username":"username",
+    "password":"password"
+}
+],
+"config":{
+  "clients-per-proxy":5
+}
+
+```
 
 
 In this example, each piece of information (IP, Port, Username, Password) is on a new line.
